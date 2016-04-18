@@ -1,0 +1,1 @@
+pythonw.exe SimpleTrigometri/main_app.py

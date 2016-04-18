@@ -1,0 +1,1 @@
+"C:\Program Files\Python35\Lib\site-packages\PyQt4\pyuic4.bat" SimpleTrigometri\views\main_view.ui -o SimpleTrigometri\views\gen\ui_main_view.py
