@@ -334,6 +334,12 @@ def path_list_calc(triangle, deg_rad):
     N = 100
     fontsize = 'large'
     fontshift = 0.05
+    fontshifts = {'A':[-fontshift,-fontshift],
+                  'B':[0,fontshift],
+                  'C':[fontshift,-fontshift],
+                  'a':[fontshift,0],
+                  'b':[0,-fontshift],
+                  'c':[-fontshift,0]}
     
     A = triangle.get('A',None)
     B = triangle.get('B',None)
@@ -350,7 +356,6 @@ def path_list_calc(triangle, deg_rad):
             C = C*np.pi/180. if C else C
 
         if A and a and b:
-            
             NN = N/2
             c = np.hstack([
                 np.arange(0,a+b+(a+b)/NN,(a+b)/NN),
@@ -371,32 +376,38 @@ def path_list_calc(triangle, deg_rad):
                 P3.append([b,0])
                 P4.append([a*np.cos(C[n])+b, a*np.sin(C[n])])
 
-                test_pos.append([[P2[-1][0]-fontshift,P2[-1][1]-fontshift],
-                            [P3[-1][0]+fontshift,P3[-1][1]-fontshift],
-                            [(P4[-1][0]-P3[-1][0])/2+fontshift,(P4[-1][1]-P3[-1][1])/2],
-                            [(P3[-1][0]-P2[-1][0])/2,(P3[-1][1]-P2[-1][1])/2-fontshift],
-                            [(P2[-1][0]-P1[-1][0])/2-fontshift,(P2[-1][0]-P1[-1][0])/2]])
-
+                test_pos.append([[P2[-1][0],P2[-1][1]],
+                            [P3[-1][0],P3[-1][1]],
+                            [(P4[-1][0]+P3[-1][0])/2,(P4[-1][1]+P3[-1][1])/2],
+                            [(P3[-1][0]+P2[-1][0])/2,(P3[-1][1]+P2[-1][1])/2],
+                            [(P2[-1][0]+P1[-1][0])/2,(P2[-1][1]+P1[-1][1])/2]])
         elif A and a and c:
-            keys = ['A','B','a','b','c']
-            
             NN = N/2
-            c = np.hstack([
-                np.arange(0,a+b+(a+b)/NN,(a+b)/NN),
-                np.arange(a+b,0,-(a+b)/NN)])
+            b = np.hstack([
+                np.arange(0,a+c+(a+c)/NN,(a+c)/NN),
+                np.arange(a+c,0,-(a+c)/NN)])
             NN = NN/2
-            C = np.hstack([
+            B = np.hstack([
                 np.arange(0,np.pi+np.pi/NN,np.pi/NN),
                 np.arange(np.pi,0,-np.pi/NN),
                 np.arange(0,np.pi+np.pi/NN,np.pi/NN),
                 np.arange(np.pi,0,-np.pi/NN)])
             
             P1, P2, P3, P4 = [], [], [], []
+            text_keys = ['A','B','a','c','b']
+            test_pos = []
             for n in range(N):
-                P1.append([c[n]*np.cos(A), c[n]*np.sin(A)])
+                P1.append([b[n], 0])
                 P2.append([0,0])
-                P3.append([b,0])
-                P4.append([a*np.cos(C[n])+b, a*np.sin(C[n])])
+                P3.append([c*np.cos(A),c*np.sin(A)])
+                P4.append([P3[-1][0]+a*np.cos(A-np.pi+B[n]), P3[-1][1]+a*np.sin(A-np.pi+B[n])])
+
+                test_pos.append([[P2[-1][0],P2[-1][1]],
+                            [P3[-1][0],P3[-1][1]],
+                            [(P4[-1][0]+P3[-1][0])/2,(P4[-1][1]+P3[-1][1])/2],
+                            [(P3[-1][0]+P2[-1][0])/2,(P3[-1][1]+P2[-1][1])/2],
+                            [(P2[-1][0]+P1[-1][0])/2,(P2[-1][1]+P1[-1][1])/2]])
+
 
         # scale path to 1
         P = np.array(P1+P2+P3+P4)
@@ -414,10 +425,14 @@ def path_list_calc(triangle, deg_rad):
         P2[:,0], P2[:,1] = P2[:,0]+xOffset, P2[:,1]+yOffset
         P3[:,0], P3[:,1] = P3[:,0]+xOffset, P3[:,1]+yOffset
         P4[:,0], P4[:,1] = P4[:,0]+xOffset, P4[:,1]+yOffset
-
+        
         test_pos = np.array(test_pos)
         test_pos = test_pos/scale
-        test_pos[:,0], test_pos[:,1] = test_pos[:,0]+xOffset, test_pos[:,1]+yOffset
+        for n in range(N): 
+            test_pos[n][:,0], test_pos[n][:,1] = test_pos[n][:,0]+xOffset, test_pos[n][:,1]+yOffset
+            for i in range(test_pos[n].shape[0]):
+                test_pos[n][i,0] = test_pos[n][i,0]+fontshifts[text_keys[i]][0]
+                test_pos[n][i,1] = test_pos[n][i,1]+fontshifts[text_keys[i]][1]
         
         # describe path
         codes = [Path.MOVETO,
