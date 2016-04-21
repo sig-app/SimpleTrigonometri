@@ -329,6 +329,7 @@ def draw_triangle(fig, triangle, deg_rad):
     axes.set_ylim(-0.2,1.2)
     axes.axis('off')
 
+
 def path_list_calc(triangle, deg_rad):
     list_of_args = []
     N = 100
